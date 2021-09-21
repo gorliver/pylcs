@@ -60,6 +60,78 @@ int lcs_length_(const string &str1, const string &str2) {
     return dp[m][n];
 }
 
+// 最长公共子序列（不连续）
+// returns lcs indexs of str2.
+// Actually I do NOT know how to return pair<vi,vi> or vvi to python...
+// vector<int> lcs_str2id_( string const &str1, string const &str2) {
+vector<int> lcs_str2id_( vector<string> s1, vector<string> s2) {
+
+    vector<int> index_of_str2;
+    //if (str1 == "" || str2 == "")
+    //    return index_of_str2;
+    //vector<string> s1 = utf8_split(str1);
+    //vector<string> s2 = utf8_split(str2);
+
+    int m = s1.size();
+    int n = s2.size();
+    vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+    vector<vector<int>> prev(m + 1, vector<int>(n + 1));
+    int i, j;
+    // printf("%d %d\n", m, n);
+
+    for (i = 0; i <= m; i++) {
+        dp[i][0] = 0;
+        prev[i][0]=0;
+    }
+    for (j = 0; j <= n; j++) {
+        dp[0][j] = 0;
+        prev[0][j]=0;
+    }
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            if (s1[i - 1] == s2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+                prev[i][j]=3;
+                //3=b11, prev status i-1, j-1
+            }
+            else
+            {
+                if (dp[i - 1][j] >= dp[i][j - 1])
+                {
+                    dp[i][j]=dp[i-1][j];
+                    prev[i][j] = 2;
+                    //2=b10, previous status i-1, j-0
+                }
+                else
+                {
+                    dp[i][j] = dp[i][j-1];
+                    prev[i][j] = 1;
+                }
+            }
+        }
+    }
+    int cur=dp[m][n]-1;
+    int curm=m;
+    int curn=n;
+    index_of_str2.resize(dp[curm][curn]);
+    while (prev[curm][curn]) {
+        if(prev[curm][curn]==3)
+        {
+            index_of_str2[cur--]=curn-1;
+            --curm;--curn;
+        }
+        else if(prev[curm][curn]==2)
+        {
+            --curm;
+        }
+        else if(prev[curm][curn]==1)
+        {
+            --curn;
+        }
+    }
+    return index_of_str2;
+}
 
 // 最长公共子串（连续）
 int lcs2_length_(const string &str1, const string &str2) {
@@ -99,6 +171,13 @@ int lcs2_length_(const string &str1, const string &str2) {
 // TODO 返回子序列
 int lcs(const string &str1, const string &str2){
     return lcs_length_(str1, str2);
+}
+
+
+vector<int> lcs_str2id(vector<string> s1, vector<string> s2)
+{
+    return lcs_str2id_(s1, s2);
+
 }
 
 
